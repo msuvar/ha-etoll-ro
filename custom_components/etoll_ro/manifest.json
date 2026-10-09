@@ -1,0 +1,13 @@
+{
+  "domain": "etoll_ro",
+  "name": "eToll România (TollRo / Rovinietă)",
+  "codeowners": ["@msuvar"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/msuvar/ha-etoll-ro",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/msuvar/ha-etoll-ro/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

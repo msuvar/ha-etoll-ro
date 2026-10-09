@@ -1,0 +1,64 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "eToll România",
+        "description": "Autentifică-te cu adresa de e-mail și parola contului etoll.ro. Autentificarea prin Google / ROeID / eIDAS / passkey nu este suportată – setează mai întâi o parolă în portal.",
+        "data": {
+          "username": "E-mail",
+          "password": "Parolă"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reautentificare eToll",
+        "description": "Parola pentru {username} nu mai este validă.",
+        "data": {
+          "password": "Parolă"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Date de autentificare greșite sau contul necesită o acțiune în portalul etoll.ro.",
+      "cannot_connect": "Nu mă pot conecta la etoll.ro.",
+      "unknown": "Eroare neașteptată."
+    },
+    "abort": {
+      "already_configured": "Acest cont este deja configurat.",
+      "reauth_successful": "Reautentificare reușită."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opțiuni eToll",
+        "data": {
+          "scan_interval": "Interval de actualizare (minute)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "wallet_balance": {
+        "name": "Sold credite TollRo"
+      },
+      "notifications": {
+        "name": "Notificări"
+      },
+      "active_services": {
+        "name": "Servicii active"
+      },
+      "vignette_expires": {
+        "name": "Expirare rovinietă"
+      },
+      "vignette_days_left": {
+        "name": "Zile rămase rovinietă"
+      }
+    },
+    "binary_sensor": {
+      "vignette_valid": {
+        "name": "Rovinietă valabilă"
+      }
+    }
+  }
+}

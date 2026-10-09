@@ -1,0 +1,64 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "eToll România",
+        "description": "Sign in with the e-mail and password of your etoll.ro account. Google / ROeID / eIDAS / passkey sign-in is not supported – set a password in the portal first.",
+        "data": {
+          "username": "E-mail",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate eToll",
+        "description": "The password for {username} is no longer valid.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid credentials, or the account requires an action in the etoll.ro portal.",
+      "cannot_connect": "Cannot connect to etoll.ro.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This account is already configured.",
+      "reauth_successful": "Re-authentication successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "eToll options",
+        "data": {
+          "scan_interval": "Update interval (minutes)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "wallet_balance": {
+        "name": "TollRo credit balance"
+      },
+      "notifications": {
+        "name": "Notifications"
+      },
+      "active_services": {
+        "name": "Active services"
+      },
+      "vignette_expires": {
+        "name": "Vignette expires"
+      },
+      "vignette_days_left": {
+        "name": "Vignette days left"
+      }
+    },
+    "binary_sensor": {
+      "vignette_valid": {
+        "name": "Vignette valid"
+      }
+    }
+  }
+}
