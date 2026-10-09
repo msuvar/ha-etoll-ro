@@ -53,6 +53,9 @@
       },
       "vignette_days_left": {
         "name": "Zile rămase rovinietă"
+      },
+      "vin": {
+        "name": "Serie șasiu (VIN)"
       }
     },
     "binary_sensor": {

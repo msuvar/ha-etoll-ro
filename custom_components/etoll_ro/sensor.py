@@ -10,7 +10,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import UnitOfTime
+from homeassistant.const import EntityCategory, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.util import dt as dt_util
@@ -47,6 +47,7 @@ async def async_setup_entry(
         for vid in new:
             entities.append(VignetteExpirySensor(coordinator, vid))
             entities.append(VignetteDaysLeftSensor(coordinator, vid))
+            entities.append(VinSensor(coordinator, vid))
         async_add_entities(entities)
 
     _add_vehicles()
@@ -158,3 +159,18 @@ class VignetteDaysLeftSensor(EtollVehicleEntity, SensorEntity):
         today = dt_util.now().date()
         exp_day = dt_util.as_local(v.vignette_expires).date()
         return max((exp_day - today).days, 0)
+
+
+class VinSensor(EtollVehicleEntity, SensorEntity):
+    """Seria de șasiu (VIN) a vehiculului."""
+
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:barcode"
+
+    def __init__(self, coordinator: EtollCoordinator, vehicle_id: str) -> None:
+        super().__init__(coordinator, vehicle_id, "vin")
+
+    @property
+    def native_value(self) -> str | None:
+        v = self.vehicle
+        return v.vin if v else None

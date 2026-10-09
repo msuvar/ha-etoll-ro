@@ -53,6 +53,9 @@
       },
       "vignette_days_left": {
         "name": "Vignette days left"
+      },
+      "vin": {
+        "name": "VIN"
       }
     },
     "binary_sensor": {

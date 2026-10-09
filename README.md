@@ -11,6 +11,7 @@ Integrare neoficială care citește datele din contul tău de pe [etoll.ro](http
 | Expirare rovinietă | `sensor` (timestamp) | Atribute: serie șasiu (VIN), categorie, normă Euro, masă maximă autorizată, sursă |
 | Zile rămase rovinietă | `sensor` (zile) | 0 când a expirat |
 | Rovinietă valabilă | `binary_sensor` | `on` cât timp rovinieta e valabilă |
+| Serie șasiu (VIN) | `sensor` (diagnostic) | Apare și ca număr de serie pe pagina dispozitivului |
 
 **Pentru cont:**
 

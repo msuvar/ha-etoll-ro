@@ -44,6 +44,7 @@ class EtollVehicleEntity(CoordinatorEntity[EtollCoordinator]):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, vehicle_id)},
             name=v.plate,
+            serial_number=v.vin,
             manufacturer=MANUFACTURER,
             model=f"Vehicul {v.vehicle_type or ''} cat. {v.category or '?'}".strip(),
             via_device=(DOMAIN, f"account_{coordinator.config_entry.unique_id}"),
