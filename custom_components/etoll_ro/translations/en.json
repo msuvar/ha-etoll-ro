@@ -56,11 +56,60 @@
       },
       "vin": {
         "name": "VIN"
+      },
+      "platform_status": {
+        "name": "Platform status",
+        "state": {
+          "operational": "Operational",
+          "performance_issues": "Performance issues",
+          "partial_outage": "Partial outage",
+          "major_outage": "Major outage",
+          "maintenance": "Maintenance"
+        }
       }
     },
     "binary_sensor": {
       "vignette_valid": {
         "name": "Vignette valid"
+      },
+      "platform_problem": {
+        "name": "Platform problem"
+      }
+    },
+    "calendar": {
+      "calendar": {
+        "name": "Expirations"
+      }
+    },
+    "event": {
+      "notification": {
+        "name": "Notification",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "vignette_will_expire": "Vignette will expire",
+              "vignette_expired": "Vignette expired",
+              "low_balance": "Low balance",
+              "route_ticket_will_expire": "Route ticket will expire",
+              "route_ticket_expired": "Route ticket expired",
+              "altered_route": "Route altered",
+              "bridge_will_expire": "Bridge pass will expire",
+              "bridge_expired": "Bridge pass expired",
+              "bridge_crossing_consumed": "Bridge crossing used",
+              "bridge_crossing_missing_toll": "Bridge crossing without toll",
+              "session_stop_expired": "Session stopped (expired)",
+              "session_stop_inactive": "Session stopped (inactive)",
+              "session_stop_insufficient_balance": "Session stopped (insufficient balance)",
+              "session_location_missing_warning": "Session location missing",
+              "session_stopped_no_location": "Session stopped (no location)",
+              "pending_shared_balance": "Shared balance pending",
+              "accepted_shared_balance": "Shared balance accepted",
+              "declined_shared_balance": "Shared balance declined",
+              "cancelled_shared_balance": "Shared balance cancelled",
+              "other": "Other"
+            }
+          }
+        }
       }
     }
   }

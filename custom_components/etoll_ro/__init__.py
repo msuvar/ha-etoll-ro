@@ -9,7 +9,12 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .api import EtollApiClient
 from .coordinator import EtollConfigEntry, EtollCoordinator
 
-PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BINARY_SENSOR]
+PLATFORMS: list[Platform] = [
+    Platform.BINARY_SENSOR,
+    Platform.CALENDAR,
+    Platform.EVENT,
+    Platform.SENSOR,
+]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: EtollConfigEntry) -> bool:

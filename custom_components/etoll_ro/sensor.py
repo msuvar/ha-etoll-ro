@@ -16,7 +16,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.util import dt as dt_util
 
 from .coordinator import EtollConfigEntry, EtollCoordinator
-from .entity import EtollAccountEntity, EtollVehicleEntity
+from .entity import EtollAccountEntity, EtollStatusEntity, EtollVehicleEntity
 
 PARALLEL_UPDATES = 0
 
@@ -32,6 +32,7 @@ async def async_setup_entry(
             WalletBalanceSensor(coordinator),
             NotificationsSensor(coordinator),
             ActiveServicesSensor(coordinator),
+            PlatformStatusSensor(coordinator),
         ]
     )
 
@@ -174,3 +175,49 @@ class VinSensor(EtollVehicleEntity, SensorEntity):
     def native_value(self) -> str | None:
         v = self.vehicle
         return v.vin if v else None
+
+
+class PlatformStatusSensor(EtollStatusEntity, SensorEntity):
+    """Starea generală a platformei etoll.ro (pagina publică de status)."""
+
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_options = [
+        "operational",
+        "performance_issues",
+        "partial_outage",
+        "major_outage",
+        "maintenance",
+    ]
+    _attr_icon = "mdi:server-network"
+
+    def __init__(self, coordinator: EtollCoordinator) -> None:
+        super().__init__(coordinator, "platform_status")
+
+    @property
+    def native_value(self) -> str | None:
+        st = self.coordinator.data.status
+        return st.summary if st else None
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        st = self.coordinator.data.status
+        if st is None:
+            return {}
+        attrs: dict[str, Any] = {
+            "components": {c.name: c.status_text for c in st.components},
+        }
+        if st.active_incidents:
+            inc = st.active_incidents[0]
+            attrs["incident"] = inc.name
+            attrs["incident_status"] = inc.status_text
+            attrs["incident_message"] = inc.message
+            attrs["incident_since"] = inc.occurred.isoformat() if inc.occurred else None
+        nxt = sorted(
+            (s for s in st.maintenance_now + st.upcoming_maintenance if s.start),
+            key=lambda s: s.start,
+        )
+        if nxt:
+            attrs["maintenance"] = nxt[0].name
+            attrs["maintenance_start"] = nxt[0].start.isoformat()
+            attrs["maintenance_end"] = nxt[0].end.isoformat() if nxt[0].end else None
+        return attrs

@@ -32,3 +32,34 @@ TOLL_TYPE_VIGNETTE: Final = "VIGNETTE"
 TOLL_TYPE_PEAJ: Final = "PEAJ"  # TollRo credits (prepaid wallet)
 TOLL_TYPE_ROUTE: Final = "ROUTE_TICKET"
 TOLL_TYPE_BRIDGE: Final = "BRIDGE"
+
+# Public status page (Cachet 3) – times are Europe/Bucharest local time
+STATUS_API_BASE: Final = "https://portal.etoll.ro/status/api"
+STATUS_TZ: Final = "Europe/Bucharest"
+STATUS_PAGE_URL: Final = "https://portal.etoll.ro/status/"
+
+EVENT_NOTIFICATION: Final = f"{DOMAIN}_notification"
+
+# Notification types seen in the portal application
+NOTIFICATION_TYPES: Final = [
+    "VIGNETTE_WILL_EXPIRE",
+    "VIGNETTE_EXPIRED",
+    "LOW_BALANCE",
+    "ROUTE_TICKET_WILL_EXPIRE",
+    "ROUTE_TICKET_EXPIRED",
+    "ALTERED_ROUTE",
+    "BRIDGE_WILL_EXPIRE",
+    "BRIDGE_EXPIRED",
+    "BRIDGE_CROSSING_CONSUMED",
+    "BRIDGE_CROSSING_MISSING_TOLL",
+    "SESSION_STOP_EXPIRED",
+    "SESSION_STOP_INACTIVE",
+    "SESSION_STOP_INSUFFICIENT_BALANCE",
+    "SESSION_LOCATION_MISSING_WARNING",
+    "SESSION_STOPPED_NO_LOCATION",
+    "PENDING_SHARED_BALANCE",
+    "ACCEPTED_SHARED_BALANCE",
+    "DECLINED_SHARED_BALANCE",
+    "CANCELLED_SHARED_BALANCE",
+    "OTHER",
+]

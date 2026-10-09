@@ -20,6 +20,29 @@ Integrare neoficială care citește datele din contul tău de pe [etoll.ro](http
 | Sold credite TollRo | `sensor` (RON), suma creditelor PEAJ active |
 | Notificări | `sensor` |
 | Servicii active | `sensor`, cu defalcare pe tipuri în atribute |
+| Notificare | `event`: se declanșează la fiecare notificare nouă din cont |
+| Expirări | `calendar`: ziua expirării fiecărei roviniete + mentenanțele anunțate |
+
+**Pentru platforma etoll.ro** (pagina publică de status):
+
+| Entitate | Tip |
+|---|---|
+| Stare platformă | `sensor`: funcțional / probleme de performanță / întrerupere parțială / întrerupere majoră / în mentenanță; atribute cu fiecare componentă, incidentul curent și următoarea mentenanță |
+| Problemă platformă | `binary_sensor` (problem): `on` la incident activ, componentă degradată sau mentenanță în curs |
+
+### Evenimentul `etoll_ro_notification`
+La fiecare notificare nouă se trimite și un eveniment pe magistrala HA, cu `type` (de ex. `VIGNETTE_WILL_EXPIRE`, `LOW_BALANCE`), `title`, `message`, `created`, `plate_number`. Notificările existente la pornirea HA nu sunt retrimise.
+
+```yaml
+triggers:
+  - trigger: event
+    event_type: etoll_ro_notification
+actions:
+  - action: notify.notify
+    data:
+      title: "eToll: {{ trigger.event.data.title }}"
+      message: "{{ trigger.event.data.message }}"
+```
 
 Vehiculele adăugate ulterior în portal apar automat la următoarea actualizare.
 
@@ -55,7 +78,7 @@ actions:
 
 ## Cum funcționează
 - Autentificarea folosește același flux ca portalul web: Keycloak `sso.etoll.ro`, realm `external`, client `ddcm-authz-client`, cod de autorizare + PKCE. Token-ul se reîmprospătează automat, iar dacă a expirat integrarea se autentifică din nou.
-- Endpoint-uri folosite (doar citire): `/api/profiles`, `/api/vehicles`, `/api/tolls?status=ACTIVE`, `/api/notifications/summary`.
+- Endpoint-uri folosite (doar citire): `/api/profiles`, `/api/vehicles`, `/api/tolls?status=ACTIVE`, `/api/notifications`, `/api/notifications/summary`, plus pagina publică de status `/status/api/{components,incidents,schedules}`.
 - Verificarea publică a rovinietei (cu CAPTCHA) **nu** este folosită.
 
 ## Depanare

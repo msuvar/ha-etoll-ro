@@ -5,7 +5,7 @@ from __future__ import annotations
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, MANUFACTURER, PORTAL_URL
+from .const import DOMAIN, MANUFACTURER, PORTAL_URL, STATUS_PAGE_URL
 from .coordinator import EtollCoordinator
 from .models import VehicleInfo
 
@@ -59,3 +59,27 @@ class EtollVehicleEntity(CoordinatorEntity[EtollCoordinator]):
     @property
     def available(self) -> bool:
         return super().available and self.vehicle is not None
+
+
+class EtollStatusEntity(CoordinatorEntity[EtollCoordinator]):
+    """Entity attached to the public platform-status device."""
+
+    _attr_has_entity_name = True
+
+    def __init__(self, coordinator: EtollCoordinator, key: str) -> None:
+        super().__init__(coordinator)
+        entry = coordinator.config_entry
+        self._attr_unique_id = f"{entry.unique_id}_{key}"
+        self._attr_translation_key = key
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, f"status_{entry.unique_id}")},
+            name="etoll.ro",
+            manufacturer=MANUFACTURER,
+            model="Stare platformă",
+            entry_type=DeviceEntryType.SERVICE,
+            configuration_url=STATUS_PAGE_URL,
+        )
+
+    @property
+    def available(self) -> bool:
+        return super().available and self.coordinator.data.status is not None

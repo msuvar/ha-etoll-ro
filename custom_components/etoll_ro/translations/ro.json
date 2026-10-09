@@ -56,11 +56,60 @@
       },
       "vin": {
         "name": "Serie șasiu (VIN)"
+      },
+      "platform_status": {
+        "name": "Stare platformă",
+        "state": {
+          "operational": "Funcțional",
+          "performance_issues": "Probleme de performanță",
+          "partial_outage": "Întrerupere parțială",
+          "major_outage": "Întrerupere majoră",
+          "maintenance": "În mentenanță"
+        }
       }
     },
     "binary_sensor": {
       "vignette_valid": {
         "name": "Rovinietă valabilă"
+      },
+      "platform_problem": {
+        "name": "Problemă platformă"
+      }
+    },
+    "calendar": {
+      "calendar": {
+        "name": "Expirări"
+      }
+    },
+    "event": {
+      "notification": {
+        "name": "Notificare",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "vignette_will_expire": "Rovinieta expiră curând",
+              "vignette_expired": "Rovinietă expirată",
+              "low_balance": "Sold scăzut",
+              "route_ticket_will_expire": "Tichetul de rută expiră curând",
+              "route_ticket_expired": "Tichet de rută expirat",
+              "altered_route": "Rută modificată",
+              "bridge_will_expire": "Trecerea de pod expiră curând",
+              "bridge_expired": "Trecere de pod expirată",
+              "bridge_crossing_consumed": "Trecere de pod folosită",
+              "bridge_crossing_missing_toll": "Trecere de pod fără taxă",
+              "session_stop_expired": "Sesiune oprită (expirată)",
+              "session_stop_inactive": "Sesiune oprită (inactivă)",
+              "session_stop_insufficient_balance": "Sesiune oprită (sold insuficient)",
+              "session_location_missing_warning": "Locație lipsă în sesiune",
+              "session_stopped_no_location": "Sesiune oprită (fără locație)",
+              "pending_shared_balance": "Sold partajat în așteptare",
+              "accepted_shared_balance": "Sold partajat acceptat",
+              "declined_shared_balance": "Sold partajat refuzat",
+              "cancelled_shared_balance": "Sold partajat anulat",
+              "other": "Altele"
+            }
+          }
+        }
       }
     }
   }

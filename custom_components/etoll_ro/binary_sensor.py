@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.components.binary_sensor import (
+    BinarySensorDeviceClass,
+    BinarySensorEntity,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.util import dt as dt_util
 
 from .coordinator import EtollConfigEntry, EtollCoordinator
-from .entity import EtollVehicleEntity
+from .entity import EtollStatusEntity, EtollVehicleEntity
 
 PARALLEL_UPDATES = 0
 
@@ -19,6 +22,7 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     coordinator = entry.runtime_data
+    async_add_entities([PlatformProblemBinarySensor(coordinator)])
     known: set[str] = set()
 
     @callback
@@ -53,3 +57,17 @@ class VignetteValidBinarySensor(EtollVehicleEntity, BinarySensorEntity):
     @property
     def icon(self) -> str:
         return "mdi:check-decagram" if self.is_on else "mdi:alert-decagram"
+
+
+class PlatformProblemBinarySensor(EtollStatusEntity, BinarySensorEntity):
+    """On = etoll.ro are incidente, componente degradate sau e în mentenanță."""
+
+    _attr_device_class = BinarySensorDeviceClass.PROBLEM
+
+    def __init__(self, coordinator: EtollCoordinator) -> None:
+        super().__init__(coordinator, "platform_problem")
+
+    @property
+    def is_on(self) -> bool | None:
+        st = self.coordinator.data.status
+        return st.has_problem if st else None

@@ -25,6 +25,7 @@ import aiohttp
 
 from .const import (
     API_BASE,
+    STATUS_API_BASE,
     AUTH_URL,
     CLIENT_ID,
     REDIRECT_URI,
@@ -355,6 +356,39 @@ class EtollApiClient:
         return await self._get_paged(
             "/tolls", "tolls", {"status": "ACTIVE", "orderBy": "DSC", "size": 50}
         )
+
+    async def async_get_notifications(self) -> list[dict]:
+        data = await self._get("/notifications", {"status": "ACTIVE"})
+        if isinstance(data, dict):
+            data = data.get("notifications") or data.get("items") or []
+        return [n for n in data if isinstance(n, dict)] if isinstance(data, list) else []
+
+    async def async_get_status(self) -> dict[str, list[dict]]:
+        """Public status page (Cachet) – no authentication needed."""
+        out: dict[str, list[dict]] = {}
+        for key, path, params in (
+            ("components", "/components", {"per_page": 100}),
+            ("incidents", "/incidents", {"per_page": 10, "sort": "-created_at"}),
+            ("schedules", "/schedules", {"per_page": 10, "sort": "-created_at"}),
+        ):
+            try:
+                async with self._session.get(
+                    f"{STATUS_API_BASE}{path}",
+                    params=params,
+                    headers={"Accept": "application/json", "User-Agent": _USER_AGENT},
+                    timeout=_TIMEOUT,
+                ) as resp:
+                    if resp.status >= 400:
+                        raise EtollConnectionError(f"status {path} -> HTTP {resp.status}")
+                    payload = await resp.json(content_type=None)
+            except (aiohttp.ClientError, asyncio.TimeoutError) as err:
+                raise EtollConnectionError(f"status {path} failed: {err}") from err
+            out[key] = [
+                item.get("attributes", {})
+                for item in (payload or {}).get("data", [])
+                if isinstance(item, dict)
+            ]
+        return out
 
     async def async_get_notification_count(self) -> int:
         data = await self._get("/notifications/summary")

@@ -11,7 +11,18 @@ from homeassistant.core import HomeAssistant
 
 from .coordinator import EtollConfigEntry
 
-TO_REDACT = {CONF_USERNAME, CONF_PASSWORD, "profile_name", "plate", "vin", "id", "profile_id"}
+TO_REDACT = {
+    CONF_USERNAME,
+    CONF_PASSWORD,
+    "profile_name",
+    "plate",
+    "plate_number",
+    "plateNumber",
+    "vin",
+    "id",
+    "profile_id",
+    "raw",
+}
 
 
 async def async_get_config_entry_diagnostics(

@@ -96,6 +96,9 @@ class EtollData:
     wallet_services: int
     notifications: int
     active_services: dict[str, int]
+    notification_list: list = field(default_factory=list)
+    new_notifications: list = field(default_factory=list)
+    status: "PlatformStatus | None" = None
 
 
 def build_data(
@@ -177,3 +180,169 @@ def build_data(
         notifications=notifications,
         active_services=active,
     )
+
+
+# --------------------------------------------------------------------------- #
+# Notifications
+# --------------------------------------------------------------------------- #
+_NOTIF_ID_KEYS = ("id", "notificationId", "uuid", "guid")
+_NOTIF_TYPE_KEYS = ("type", "notificationType", "code", "category", "event")
+_NOTIF_TITLE_KEYS = ("title", "subject", "name")
+_NOTIF_MSG_KEYS = ("message", "body", "description", "text", "content")
+_NOTIF_TIME_KEYS = ("createdAt", "created", "createdDate", "date", "timestamp", "sentAt")
+
+
+@dataclass
+class Notification:
+    """One portal notification, normalised."""
+
+    id: str
+    type: str
+    title: str | None
+    message: str | None
+    created: datetime | None
+    plate: str | None
+    raw: dict
+
+    def as_event_data(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "type": self.type,
+            "title": self.title,
+            "message": self.message,
+            "created": self.created.isoformat() if self.created else None,
+            "plate_number": self.plate,
+        }
+
+
+def parse_notification(raw: dict) -> Notification | None:
+    nid = _first(raw, _NOTIF_ID_KEYS)
+    ntype = _first(raw, _NOTIF_TYPE_KEYS)
+    if nid is None:
+        # fall back to a stable fingerprint
+        nid = f"{ntype}|{_first(raw, _NOTIF_TIME_KEYS)}|{_first(raw, _NOTIF_MSG_KEYS)}"
+    created = _first(raw, _NOTIF_TIME_KEYS)
+    created_dt = parse_dt(created) if isinstance(created, str) else None
+    plate = raw.get("plateNumber")
+    if not plate and isinstance(raw.get("vehicle"), dict):
+        plate = raw["vehicle"].get("plateNumber")
+    return Notification(
+        id=str(nid),
+        type=str(ntype or "OTHER").upper(),
+        title=_first(raw, _NOTIF_TITLE_KEYS),
+        message=_first(raw, _NOTIF_MSG_KEYS),
+        created=created_dt,
+        plate=plate,
+        raw=raw,
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Platform status (Cachet 3 public API)
+# --------------------------------------------------------------------------- #
+@dataclass
+class StatusComponent:
+    name: str
+    status: int
+    status_text: str
+    description: str | None
+
+
+@dataclass
+class StatusIncident:
+    name: str
+    message: str | None
+    status: int  # 4 = fixed
+    status_text: str
+    occurred: datetime | None
+
+
+@dataclass
+class StatusSchedule:
+    name: str
+    message: str | None
+    status: int  # 0 upcoming, 1 in progress, 2 complete
+    status_text: str
+    start: datetime | None
+    end: datetime | None
+
+
+@dataclass
+class PlatformStatus:
+    components: list[StatusComponent]
+    incidents: list[StatusIncident]
+    schedules: list[StatusSchedule]
+
+    @property
+    def active_incidents(self) -> list[StatusIncident]:
+        return [i for i in self.incidents if i.status < 4]
+
+    @property
+    def degraded_components(self) -> list[StatusComponent]:
+        return [c for c in self.components if c.status != 1]
+
+    @property
+    def maintenance_now(self) -> list[StatusSchedule]:
+        return [s for s in self.schedules if s.status == 1]
+
+    @property
+    def upcoming_maintenance(self) -> list[StatusSchedule]:
+        return [s for s in self.schedules if s.status == 0]
+
+    @property
+    def has_problem(self) -> bool:
+        return bool(self.degraded_components or self.active_incidents or self.maintenance_now)
+
+    @property
+    def summary(self) -> str:
+        if self.maintenance_now:
+            return "maintenance"
+        if not self.degraded_components and not self.active_incidents:
+            return "operational"
+        worst = max((c.status for c in self.degraded_components), default=2)
+        return {2: "performance_issues", 3: "partial_outage", 4: "major_outage"}.get(
+            worst, "maintenance" if worst >= 5 else "performance_issues"
+        )
+
+
+def _cachet_dt(block: Any, tz) -> datetime | None:
+    if not isinstance(block, dict) or not block.get("string"):
+        return None
+    try:
+        return datetime.strptime(block["string"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=tz)
+    except ValueError:
+        return None
+
+
+def _cachet_status(block: Any) -> tuple[int, str]:
+    if isinstance(block, dict):
+        try:
+            return int(block.get("value", 0)), str(block.get("human") or "")
+        except (TypeError, ValueError):
+            pass
+    return 0, ""
+
+
+def build_status(raw: dict[str, list[dict]], tz) -> PlatformStatus:
+    comps = []
+    for c in raw.get("components", []):
+        if c.get("enabled") is False:
+            continue
+        val, txt = _cachet_status(c.get("latest_status") or c.get("status"))
+        comps.append(StatusComponent(c.get("name") or "?", val, txt, c.get("description") or None))
+    incs = []
+    for i in raw.get("incidents", []):
+        if i.get("visible") in (0, False):
+            continue
+        val, txt = _cachet_status(i.get("status"))
+        incs.append(StatusIncident(i.get("name", "").strip(), i.get("message"), val, txt, _cachet_dt(i.get("occurred"), tz)))
+    scheds = []
+    for s in raw.get("schedules", []):
+        val, txt = _cachet_status(s.get("status"))
+        scheds.append(
+            StatusSchedule(
+                s.get("name", "").strip(), s.get("message"), val, txt,
+                _cachet_dt(s.get("scheduled"), tz), _cachet_dt(s.get("completed"), tz),
+            )
+        )
+    return PlatformStatus(comps, incs, scheds)
