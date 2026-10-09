@@ -129,6 +129,7 @@ class VignetteExpirySensor(EtollVehicleEntity, SensorEntity):
         return {
             "plate_number": v.plate,
             "country": v.country,
+            "vin": v.vin,
             "vehicle_type": v.vehicle_type,
             "category": v.category,
             "emission_standard": v.emission_standard,

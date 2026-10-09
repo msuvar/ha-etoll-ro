@@ -8,7 +8,7 @@ Integrare neoficială care citește datele din contul tău de pe [etoll.ro](http
 
 | Entitate | Tip | Detalii |
 |---|---|---|
-| Expirare rovinietă | `sensor` (timestamp) | Atribute: categorie, normă Euro, masă maximă autorizată, sursă |
+| Expirare rovinietă | `sensor` (timestamp) | Atribute: serie șasiu (VIN), categorie, normă Euro, masă maximă autorizată, sursă |
 | Zile rămase rovinietă | `sensor` (zile) | 0 când a expirat |
 | Rovinietă valabilă | `binary_sensor` | `on` cât timp rovinieta e valabilă |
 
@@ -64,7 +64,7 @@ logger:
   logs:
     custom_components.etoll_ro: debug
 ```
-Diagnosticele (*⋮ → Descarcă diagnostice*) ascund e-mailul, parola, numerele de înmatriculare și ID-urile.
+Diagnosticele (*⋮ → Descarcă diagnostice*) ascund e-mailul, parola, numerele de înmatriculare, seriile de șasiu și ID-urile.
 
 ## Limitări
 - API-ul portalului nu e public și se poate schimba fără anunț.

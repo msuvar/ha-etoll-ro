@@ -73,6 +73,7 @@ class VehicleInfo:
     id: str
     plate: str
     country: str | None
+    vin: str | None
     vehicle_type: str | None
     category: str | None
     emission_standard: str | None
@@ -143,6 +144,7 @@ def build_data(
             id=vid,
             plate=v.get("plateNumber") or plate,
             country=v.get("countryCode") or v.get("country"),
+            vin=v.get("vin") or None,
             vehicle_type=v.get("vehicleType"),
             category=v.get("category"),
             emission_standard=v.get("emissionStandard"),
